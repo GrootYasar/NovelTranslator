@@ -49,42 +49,43 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: 'No content found' }), { status: 404 });
     }
 
-    // Remove ads and scripts while preserving structure
-    $('.txtnav .contentadv, .txtnav .bottom-ad, .txtnav script').remove();
+    // Aggressive cleaning to remove metadata, notes, and navigation
+    $('.txtnav .contentadv, .txtnav .bottom-ad, .txtnav script, .txtnav .page1, .txtnav p:contains("ps"), .txtnav p:contains("作者"), .txtnav p:contains("本章完")').remove();
     content = $('.txtnav').html() || '';
 
-    // Extract original paragraphs
+    // Extract only the main body paragraphs
     const $content = load(content);
     const paragraphs = $content.root().find('p').length
-      ? $content.root().find('p')
-      : $content.root().contents().filter((i, el) => el.type === 'text' && $(el).text().trim());
+      ? $content.root().find('p').filter((i, el) => !$(el).text().match(/ps|作者|本章完|感谢/))
+      : $content.root().contents().filter((i, el) => el.type === 'text' && $(el).text().trim() && !$(el).text().match(/ps|作者|本章完|感谢/));
     const originalSegments = [];
     paragraphs.each((i, el) => {
       const text = $(el).text().trim();
       if (text) originalSegments.push(text);
     });
     if (originalSegments.length === 0) {
-      const textContent = $content.text().trim();
-      originalSegments.push(...textContent.split('\n\n').map(t => t.trim()).filter(t => t)); // Use double newlines for paragraphs
+      const textContent = $content.text().trim().replace(/\s*(ps|作者|本章完|感谢).*|\n{2,}/g, '\n\n');
+      originalSegments.push(...textContent.split('\n\n').map(t => t.trim()).filter(t => t && !t.match(/ps|作者|本章完|感谢/)));
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // Translate the entire chapter at once
+    // Translate the main chapter content only
     console.log('Translating full chapter...');
     const result = await model.generateContent(`Translate the following Chinese text to English naturally and fluently:\n\n${originalSegments.join('\n\n')}`);
     const translatedText = result.response.text();
 
-    // Split translated text into paragraphs based on original structure
+    // Split translated text into paragraphs
     const translatedSegments = translatedText.split('\n\n').map(t => t.trim()).filter(t => t);
     let translatedContent = '';
     for (let i = 0; i < Math.min(originalSegments.length, translatedSegments.length); i++) {
       translatedContent += `<p>${translatedSegments[i] || ''}</p>\n`;
     }
     if (translatedSegments.length < originalSegments.length) {
+      console.warn('Translation shorter than original; padding with empty paragraphs');
       for (let i = translatedSegments.length; i < originalSegments.length; i++) {
-        translatedContent += `<p>${originalSegments[i]}</p>\n`; // Fallback to original if translation is short
+        translatedContent += '<p></p>\n';
       }
     }
 

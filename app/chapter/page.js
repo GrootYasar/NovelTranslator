@@ -47,52 +47,179 @@ export default function Home() {
   }, [url]);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
-      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 text-center shadow-lg">
-        <h1 className="text-3xl font-bold">Novel Translator</h1>
+    <>
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+          body {
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+          }
+          header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+          }
+          header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+          }
+          .input-form {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            margin: 2rem auto;
+            max-width: 800px;
+            display: flex;
+            gap: 1rem;
+          }
+          .input-form input {
+            flex: 1;
+            padding: 0.75rem;
+            background: #2d2d2d;
+            border: 1px solid #444444;
+            border-radius: 5px;
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+          }
+          .input-form input:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.3);
+          }
+          .input-form button {
+            padding: 0.75rem 1.5rem;
+            background: #4dabf7;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+          }
+          .input-form button:hover {
+            background: #339af0;
+          }
+          .input-form button:disabled {
+            background: #666666;
+            cursor: not-allowed;
+          }
+          .error {
+            color: #ff4444;
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+          }
+          .chapter-container {
+            background: #1a1a1a;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            margin: 0 auto 2rem;
+            max-width: 800px;
+          }
+          .chapter-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #4dabf7;
+            margin-bottom: 1.5rem;
+            text-align: center;
+          }
+          .chapter-content p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #e0e0e0;
+            margin-bottom: 1.25rem;
+            text-align: justify;
+          }
+          .nav-buttons {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+          }
+          .nav-buttons button {
+            padding: 0.75rem 1.5rem;
+            background: #4dabf7;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+          }
+          .nav-buttons button:hover {
+            background: #339af0;
+          }
+          .nav-buttons .prev-btn {
+            background: #666666;
+            color: #ffffff;
+          }
+          .nav-buttons .prev-btn:hover {
+            background: #888888;
+          }
+          @media (max-width: 600px) {
+            .input-form, .chapter-container {
+              margin: 1rem;
+              padding: 1rem;
+            }
+            .input-form {
+              flex-direction: column;
+              gap: 0.5rem;
+            }
+            .input-form input, .input-form button {
+              width: 100%;
+            }
+            .chapter-title {
+              font-size: 1.75rem;
+            }
+            .chapter-content p {
+              font-size: 1rem;
+            }
+          }
+        `}
+      </style>
+      <header>
+        <h1>Novel Translator</h1>
       </header>
-      <main className="max-w-5xl mx-auto p-6">
-        <form onSubmit={handleSubmit} className="mb-8 bg-white p-4 rounded-lg shadow-md">
-          <div className="flex gap-4 items-center">
-            <input
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter chapter URL (e.g., https://www.69shuba.com/txt/84418/40150610)"
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition duration-200"
-            >
-              {loading ? 'Loading...' : 'Load Chapter'}
-            </button>
-          </div>
-        </form>
-        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+      <main>
+        <div className="input-form">
+          <form onSubmit={handleSubmit}>
+            <div className="flex gap-4 items-center">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter chapter URL (e.g., https://www.69shuba.com/txt/84418/40150610)"
+              />
+              <button type="submit" disabled={loading}>
+                {loading ? 'Loading...' : 'Load Chapter'}
+              </button>
+            </div>
+          </form>
+        </div>
+        {error && <p className="error">{error}</p>}
         {chapter.chapterTitle && (
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h1 className="text-4xl font-bold mb-6 text-gray-900">{chapter.chapterTitle}</h1>
-            <div
-              className="prose max-w-none text-gray-800 leading-relaxed text-justify"
-              style={{ lineHeight: '1.8', fontSize: '1.1rem' }}
-              dangerouslySetInnerHTML={{ __html: chapter.translatedContent }}
-            />
-            <div className="mt-8 flex gap-4 justify-center">
+          <div className="chapter-container">
+            <h1 className="chapter-title">{chapter.chapterTitle}</h1>
+            <div className="chapter-content" dangerouslySetInnerHTML={{ __html: chapter.translatedContent }} />
+            <div className="nav-buttons">
               {chapter.prevChapter && (
-                <button
-                  onClick={() => handleNavigation(chapter.prevChapter)}
-                  className="bg-gray-300 text-gray-800 p-3 rounded-lg hover:bg-gray-400 transition duration-200"
-                >
+                <button onClick={() => handleNavigation(chapter.prevChapter)} className="prev-btn">
                   Previous Chapter
                 </button>
               )}
               {chapter.nextChapter && (
-                <button
-                  onClick={() => handleNavigation(chapter.nextChapter)}
-                  className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-200"
-                >
+                <button onClick={() => handleNavigation(chapter.nextChapter)} className="next-btn">
                   Next Chapter
                 </button>
               )}
@@ -100,6 +227,6 @@ export default function Home() {
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 }
