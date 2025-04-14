@@ -64,7 +64,7 @@ export default function Home() {
       {chapter.chapterTitle && (
         <div style={{ marginTop: '20px' }}>
           <h1>{chapter.chapterTitle}</h1>
-          <div>{chapter.translatedContent}</div>
+          <div dangerouslySetInnerHTML={{ __html: chapter.translatedContent }}></div>
           <div style={{ marginTop: '20px' }}>
             {chapter.prevChapter && (
               <button onClick={() => handleNavigation(chapter.prevChapter)}>Previous Chapter</button>
